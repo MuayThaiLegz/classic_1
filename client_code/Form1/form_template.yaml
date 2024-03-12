@@ -1,0 +1,13 @@
+is_package: true
+container:
+  type: HtmlTemplate
+  properties: {html: '@theme:dashboard.html'}
+components:
+- type: ColumnPanel
+  properties: {}
+  name: content_panel
+  layout_properties: {slot: default}
+- name: label_1
+  properties: {text: Cognitive }
+  type: Label
+  layout_properties: {slot: title}
