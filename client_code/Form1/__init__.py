@@ -8,23 +8,9 @@ class Form1(Form1Template):
         self.init_components(**properties)
         
         # Dynamically create a sidebar container.
+      
         self.left_nav = ColumnPanel()
         self.add_component(self.left_nav, slot="sidebar")
-        
-        # Define menu items and initially disabled menu buttons list
-        self.menu = ["Analyze Data", "Find Anomalies", "Embedded Database", "Multi Sense"]
-        self.menu_buttons = []
-        
-        # Dynamically create and add a disabled button for each menu item to the sidebar.
-        for item in self.menu:
-            button = Button(text=item, icon="view-list", role="secondary-menu", enabled=False)
-            button.set_event_handler('click', self.menu_item_clicked)
-            self.left_nav.add_component(button)
-            self.menu_buttons.append(button)
-        
-        # Add a separator for visual distinction
-        self.left_nav.add_component(Label(text="--------------", bold=True))
-        
         # Create a TextBox for IP input and add it to the sidebar.
         self.ip_address_box = TextBox(placeholder="e.g., 192.168.1.1")
         self.left_nav.add_component(self.ip_address_box)
@@ -33,6 +19,21 @@ class Form1(Form1Template):
         self.connect_button = Button(text="Connect")
         self.left_nav.add_component(self.connect_button)
         self.connect_button.set_event_handler('click', self.connect_button_click)
+        
+        # Define menu items and initially disabled menu buttons list
+        self.menu = ["Analyze Data", "Find Anomalies", "Embedded Database", "Multi Sense"]
+        self.menu_buttons = []
+        
+        # Dynamically create and add a disabled button for each menu item to the sidebar.
+        for item in self.menu:
+            button = Button(text=item,enabled=False)
+            button.set_event_handler('click', self.menu_item_clicked)
+            self.left_nav.add_component(button)
+            self.menu_buttons.append(button)
+        
+        # Add a separator for visual distinction
+        self.left_nav.add_component(Label(text="--------------", bold=True))
+        
         
         # Initialize a label for connection status messages and add it to the sidebar.
         self.warning_label = Label(text="")
