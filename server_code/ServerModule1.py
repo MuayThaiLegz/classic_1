@@ -29,7 +29,7 @@ def get_verticals():
 
 
 @anvil.server.callable
-def process_and_load_file(file, connString):
+def process_and_load_file(file):
     try:
         # Convert bytes to a file-like object
         file_like_object = BytesIO(file.get_bytes())
@@ -44,7 +44,9 @@ def process_and_load_file(file, connString):
         # Add more elif blocks for other content types if necessary
         
         # Example process and load data into MongoDB (simplified)
-        client = MongoClient(connString)
+        if 'client' not in globals():
+          return {}
+
         uploaded_fileName = file.name.replace('.csv', '')
         db = client['AnvilVille']
         collection = db[f'{uploaded_fileName}']
