@@ -30,8 +30,8 @@ def get_verticals(connString):
     """
     try:
         client = MongoClient(connString)
-        verticals = {db: client[db].list_collection_names() for db in client.list_database_names() if db not in ['admin', 'local', 'config']}
-        client.close()
+        verticals = {db: client[db].list_collection_names() for db in client.list_database_names() if db not in ['admin', 'local', 'config','Modelsdb','dev_db','document_embeddings','Models_evaluation']}
+        print(verticals.keys())
         return True, verticals
     except Exception as e:
         return False, f"Failed to get verticals: {str(e)}"
@@ -43,43 +43,48 @@ def sanitize_name(name):
 
 @anvil.server.background_task
 def store_data(db_name, collection_name, file, connString):
+    print('Entering')
     """
     Stores the data from the uploaded file into the specified MongoDB collection.
     """
-    try:
-        # Ensure file is not None and has a content_type
-        if not file or not hasattr(file, 'content_type'):
-            return False, "No file or file type provided."
+  
+      # Ensure file is not None and has a content_type
+    if not file or not hasattr(file, 'content_type'):
+      print("No file or file type provided.")
+      return False, "No file or file type provided."
+      
+    sanitized_db_name = re.sub(r'[.\s]', '_', db_name)
+    print(sanitized_db_name)
+  
+    sanitized_collection_name = sanitize_name(collection_name)
+    print(sanitized_collection_name)
 
-        sanitized_db_name = sanitize_name(db_name)
-        sanitized_collection_name = sanitize_name(collection_name)
+    client = MongoClient(connString)
+    db = client[sanitized_db_name]
+    collection = db[sanitized_collection_name]
+    
+    # Read file into DataFrame
+    file_like_object = BytesIO(file.get_bytes())
+    print(file_like_object)
+    if file.content_type == 'text/csv':
+        df = pd.read_csv(file_like_object)
+    # elif file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+    #     df = pd.read_excel(file_like_object)
+    # elif file.content_type == 'application/json':
+    #     df = pd.read_json(file_like_object)
+    else:
+        return False, "Unsupported file type."
 
-        client = MongoClient(connString)
-        db = client[sanitized_db_name]
-        collection = db[sanitized_collection_name]
-        
-        # Read file into DataFrame
-        file_like_object = BytesIO(file.get_bytes())
-        if file.content_type == 'text/csv':
-            df = pd.read_csv(file_like_object)
-        elif file.content_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            df = pd.read_excel(file_like_object)
-        elif file.content_type == 'application/json':
-            df = pd.read_json(file_like_object)
-        else:
-            return False, "Unsupported file type."
-
-        # Process and store the DataFrame
-        processed_df, _, _, _, _, _, _ = process_datafile(df)
-        records = processed_df.to_dict('records')
-        collection.insert_many(records)
-        client.close()
-        return True, f"Data saved successfully in {sanitized_db_name}/{sanitized_collection_name}."
-    except Exception as e:
-        return False, f"Failed to store data: {str(e)}"
-
+    # Process and store the DataFrame
+    # processed_df, _, _, _, _, _, _ = process_datafile(df)
+    records = df.to_dict('records')
+    collection.insert_many(records)
+    client.close()
+    return True, f"Data saved successfully in {sanitized_db_name}/{sanitized_collection_name}."
+    
 @anvil.server.callable
 def initiate_file_processing(file, db_name, collection_name, connString):
+    print('Entering')
     anvil.server.launch_background_task('store_data', file, db_name, collection_name, connString)
     return "Processing started"
   
