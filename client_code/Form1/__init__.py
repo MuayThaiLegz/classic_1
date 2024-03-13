@@ -56,23 +56,6 @@ class Form1(Form1Template):
           except Exception as e:
               alert(f"Error processing file: {str(e)}")
 
-    # def process_file_click(self, **event_args):
-    #     if self.file_loader.file:
-    #         db_name = "Specify_DB_name_based_on_user_choice"  # This should be set based on user input.
-    #         collection_name = "Specify_collection_name_based_on_user_input"  # Ditto.
-    #         success = anvil.server.call('process_and_load_file', self.file_loader.file, self.ip_address_box.text, db_name, collection_name)
-    #         if success:
-    #             alert("File processed successfully.")
-    #         else:
-    #             alert("Error processing file.")
-    # def process_file_click(self, **event_args):
-    #     if self.file_loader.file:
-    #         try:
-    #             result = anvil.server.call('process_and_load_file', self.file_loader.file)
-    #             if result:
-    #                 alert("File processed successfully.")
-    #         except Exception as e:
-    #             alert(f"Error processing file: {str(e)}")
 
     def menu_item_clicked(self, sender, **event_args):
         print(f"Menu item clicked: {sender.text}")
