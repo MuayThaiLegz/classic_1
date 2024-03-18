@@ -14,7 +14,7 @@ class Form1(Form1Template):
         
         # Authenticate user at startup
         if get_user() is None:
-            login_with_form()
+            login_with_form()                                                             
         
         # Initialize UI components after successful login
         self.initialize_ui_components()
